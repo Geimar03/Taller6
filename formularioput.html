@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Actualizar Post</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Actualizar Post</h2>
+        
+        <form id="updatePostForm">
+            <div class="form-group">
+                <label for="postId">ID del Post:</label>
+                <input type="number" class="form-control" id="postId" required readonly> <!-- Readonly para evitar cambios -->
+            </div>
+            <div class="form-group">
+                <label for="postTitle">Título:</label>
+                <input type="text" class="form-control" id="postTitle" required>
+            </div>
+            <div class="form-group">
+                <label for="postBody">Cuerpo:</label>
+                <textarea class="form-control" id="postBody" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('id');
+            
+            if (postId) {
+                document.getElementById('postId').value = postId; 
+            }
+            
+            document.getElementById('updatePostForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const postId = document.getElementById('postId').value;
+                const postTitle = document.getElementById('postTitle').value;
+                const postBody = document.getElementById('postBody').value;
+
+                fetch(`http://localhost:3000/posts/${postId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: parseInt(postId),
+                        title: postTitle,
+                        body: postBody,
+                        userId: 1
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Hubo un problema al actualizar el post.');
+                    }
+                    return response.json();
+                })
+                .then(updatedPost => {
+                    alert('Post actualizado exitosamente!');
+                    console.log(updatedPost);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Hubo un error al actualizar el post.');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
